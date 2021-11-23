@@ -1,0 +1,55 @@
+# (c) Silvaco Inc., 2018
+go atlas
+
+mesh  space.mult=1.0
+# 
+x.mesh loc=0.00 spac=0.5
+x.mesh loc=3.00 spac=0.2
+x.mesh loc=5.00 spac=0.25
+x.mesh loc=7.00 spac=0.25
+x.mesh loc=9.00 spac=0.2
+x.mesh loc=12.00 spac=0.5
+#
+y.mesh loc=0.00 spac=0.1
+y.mesh loc=1.00 spac=0.1
+y.mesh loc=2.00 spac=0.2
+y.mesh loc=5.00 spac=0.4
+
+
+region  num=1  material=silicon x.min=0 x.max=12 y.min=0 y.max=1
+region num=2 material=SiO2 x.min=0 x.max=12 y.min=1 y.max=1.002
+region  num=3  material=silicon x.min=0 x.max=12 y.min=1.002 y.max=5
+region  num=4  silicon x.min=0 x.max=8 y.min=1 y.max=1.002
+
+electr  name=anode  x.min=5  length=3
+electr  name=cathode  bot
+
+#....   N-epi doping 
+doping  n.type conc=5.e16 uniform
+
+#....   Guardring doping 
+doping   p.type conc=1e19 x.min=0  x.max=3  junc=1 rat=0.6 gauss
+doping   p.type conc=1e19 x.min=9 x.max=12 junc=1 rat=0.6 gauss
+
+#....   N+ doping 
+doping  n.type conc=1e16 region=3 uniform
+
+#doping n.type conc=1e16 region=1 uniform
+
+save outf=diodeex01_0.str
+
+
+
+model    conmob  fldmob  srh  auger  bgn 
+contact    name=anode workf=4.97
+
+solve      init
+
+method newton
+
+log   outfile=diodeex01.log
+solve      vanode=0.05  vstep=0.05  vfinal=1  name=anode
+tonyplot diodeex01.log -set diodeex01_log.set
+quit
+
+

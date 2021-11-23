@@ -1,0 +1,61 @@
+go atlas
+mesh space.mult=1.0
+#
+x.mesh loc=0.00 spac=0.01
+x.mesh loc=0.20 spac=0.0001
+x.mesh loc=0.26 spac=0.01
+x.mesh loc=0.30 spac=0.0001
+x.mesh loc=0.40 spac=0.01
+x.mesh loc=0.5 spac=0.01
+#
+y.mesh loc=0.00 spac=0.01
+y.mesh loc=0.002 spac=0.001
+x.mesh loc=0.005 spac=0.001
+x.mesh loc=0.035 spac=0.001
+x.mesh loc=0.065 spac=0.001
+#
+region num=1 material= Air x.min=0 y.min=0
+region num=2 material= SiO2 x.min=0.2 x.max=0.3 y.min=0.002 y.max=0.005
+region num=3 material= silicon x.min=0 x.max=0.2 y.min=0.005 y.max=0.035
+region num=4 material= silicon x.min=0.2 x.max=0.3 y.min=0.005 y.max=0.035
+region num=5 material= silicon x.min=0.3 x.max=0.5 y.min=0.005 y.max=0.035
+region num=6 material= silicon x.min=0 x.max=0.5 y.min=0.035 y.max=0.065
+#
+electrode name= gate x.min=0.2 xmax=0.3 y.min=0 y.max=0.002
+electrode name= source x.min=0 xmax=0.1 y.min=0.002 y.max=0.005
+electrode name= drain x.min=0.4 xmax=0.5 y.min=0.002 y.max=0.005
+#
+doping uniform concentration 1E18 p.type region=6
+doping uniform concentration 1E20 n.type region=3
+doping uniform concentration 1E17 p.type region=4
+doping uniform concentration 1E20 p.type region=5
+#
+interf q3e10 y.max=0.005
+#
+contact name= gate workfn=4.6
+contact name= source 
+contact name= drain
+#
+#
+models conmob srh auger bgn f1dmob print
+#
+method newton trap
+#
+output val.band con.band qfn qfp.e.field j.electron j.hole j.conduction j.total ex.field ey.field flowline e.mobility h.mobility qss e.temp h.temp j.disp
+#
+solve init
+solve prev
+solve vdrain=0
+solve vdrain=0.1
+solve vdrain=0.5
+solve vdrain=1
+#
+log outf sim1.log master
+solve ac freq=1e6 vgate=0 vstep=0.1 vfinal=1 name=gate
+#
+save outf=sim1.str
+tonyplot sim1.str
+tonyplot sim1.log
+#
+Quit
+
